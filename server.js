@@ -4,6 +4,7 @@ import path from 'path';
 import mongoose from 'mongoose';
 import Card from './models/card.js';
 import { filterOptions } from 'mongodb/lib/utils.js';
+import 'dotenv/config';
 
 const app = express();
 app.use('/public', express.static('public'));
@@ -12,6 +13,8 @@ app.use(bodyParser.json());
 //static files
 app.use(express.static('public'));
 
+const dbURL = process.env.monConnect;
+mongoose.connect(dbURL);
 
 //get cards
 app.get('/cards', async (req,res) => {
