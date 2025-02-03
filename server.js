@@ -12,7 +12,6 @@ app.use(bodyParser.json());
 //static files
 app.use(express.static('public'));
 
-mongoose.connect("mongodb+srv://soxe:scooby253@profiles-cards.hg2f4.mongodb.net/?retryWrites=true&w=majority&appName=Profiles-Cards");
 
 //get cards
 app.get('/cards', async (req,res) => {
