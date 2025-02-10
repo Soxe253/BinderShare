@@ -7,7 +7,7 @@ async function getCards(){
             return;
         }
         console.log(data);
-        const item = document.getElementById('cards');
+        const item = document.getElementById('ddcard');
         data.cards.forEach(card => {
             const newElement = document.createElement("p");
             newElement.textContent = `

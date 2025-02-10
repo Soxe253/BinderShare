@@ -13,6 +13,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use('/public', express.static('public'));
 app.use(bodyParser.json());
+app.use(express.json());
 
 //static files
 app.use(express.static('public'));
@@ -36,7 +37,7 @@ app.get('/cards', async (req,res) => {
 });
 
 //add card- real function
-app.post('/cards', async (req, res) => {
+app.post('/addCard', async (req, res) => {
     const {name, cardNumber, auto, variant } = req.body;
     try{
         const card = new Card({name, cardNumber, auto, variant});
@@ -67,7 +68,7 @@ app.delete('/cards', async (req, res) => {
 async function addCard(){
     try{
         const card = new Card ({
-            name: "testCard",
+            name: "testCard1",
             cardNumber: "1/100",
             auto: false,
             variant: "Chrome"
@@ -96,6 +97,25 @@ app.post('/login', (req,res) => {
 // send to login
 app.get('/', (req, res) => {
     res.sendFile(path.join(path.resolve(), 'public/login.html'));
+});
+
+//delete
+app.delete('/deleteCard', async (req, res) => {
+    try {
+        console.log("Request Body:", req.body);
+        const {cardID} = req.body;
+
+        // Remove the card
+        const card = await Card.findByIdAndDelete(cardID);
+
+        if (!card) {
+            return res.status(404).json({ message: "Card not found" });
+        }
+
+        res.json({ message: "Card deleted successfully", cardID });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
 const port = process.env.PORT || 3000;
