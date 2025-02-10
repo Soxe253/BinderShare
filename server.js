@@ -1,10 +1,14 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import Card from './models/card.js';
 import { filterOptions } from 'mongodb/lib/utils.js';
 import 'dotenv/config';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use('/public', express.static('public'));
@@ -15,6 +19,11 @@ app.use(express.static('public'));
 
 const dbURL = process.env.monConnect;
 mongoose.connect(dbURL);
+
+// go home 
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/home.html'));
+});
 
 //get cards
 app.get('/cards', async (req,res) => {
@@ -72,9 +81,21 @@ async function addCard(){
 
 //addCard();
 
-// Serve home.html
+//login check
+//hardcoded login
+const admin = {username: "soxe", password: "123"};
+app.post('/login', (req,res) => {
+    const {username,password} = req.body;
+    if(username === admin.username && password === admin.password){
+        res.status(200).json({ message: "Login successful", user: { username } });
+    } else {
+        res.status(401).json({ message: "Invalid username or password" });
+    }
+});
+
+// send to login
 app.get('/', (req, res) => {
-    res.sendFile(path.join(path.resolve(), 'public/home.html'));
+    res.sendFile(path.join(path.resolve(), 'public/login.html'));
 });
 
 const port = process.env.PORT || 3000;
