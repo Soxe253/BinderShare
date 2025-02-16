@@ -14,7 +14,8 @@ async function getCards(){
                 name: ${card.name}, 
                 Card Number: ${card.cardNumber}, 
                 Auto: ${card.auto ? 'Yes' : 'No'}, 
-                Variant: ${card.variant || 'N/A'}
+                Variant: ${card.variant || 'N/A'},
+                Owner: ${card.owner},
                 `;
             item.appendChild(newElement);
         });
