@@ -38,9 +38,10 @@ app.get('/cards', async (req,res) => {
 
 //add card- real function
 app.post('/addCard', async (req, res) => {
-    const {name, cardNumber, auto, variant } = req.body;
+    console.log("Received data:", req.body); 
+    const {name, cardNumber, auto, variant, owner } = req.body;
     try{
-        const card = new Card({name, cardNumber, auto, variant});
+        const card = new Card({name, cardNumber, auto, variant, owner});
         await card.save();
         res.status(201).send(card);
     } catch(e) {
@@ -50,9 +51,9 @@ app.post('/addCard', async (req, res) => {
 
 //delete card- real function
 app.delete('/cards', async (req, res) => {
-    const {name, cardNumber, auto, variant } = req.body;
+    const {name, cardNumber, auto, variant, owner } = req.body;
     try{
-        const card = Card.findOneAndDelete({name, cardNumber, auto, variant });
+        const card = Card.findOneAndDelete({name, cardNumber, auto, variant, owner });
 
         if(!card){
             return res.status(404).send('Card not found');
@@ -118,7 +119,7 @@ app.delete('/deleteCard', async (req, res) => {
     }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });

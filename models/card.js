@@ -6,6 +6,7 @@ const cardSchema = new Schema({
     cardNumber: { type: String, required: true},
     auto: { type: Boolean, required: true},
     variant: { type: String },
+    owner : { type: String },
 })
 
 const Card = model('Card', cardSchema);
