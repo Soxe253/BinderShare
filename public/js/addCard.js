@@ -6,9 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const cardNumber = document.getElementById("cardNumber").value;
         const auto = document.getElementById("auto").checked;
         const variant = document.getElementById("variant").value;
-        const owner = document.getElementById("owner").value;
 
-        const data = {name, cardNumber, auto, variant, owner};
+        const data = {name, cardNumber, auto, variant};
 
         try{
             const response = await fetch('/addCard', {

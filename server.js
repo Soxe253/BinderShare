@@ -38,9 +38,9 @@ app.get('/cards', async (req,res) => {
 
 //add card- real function
 app.post('/addCard', async (req, res) => {
-    const {name, cardNumber, auto, variant, owner} = req.body;
+    const {name, cardNumber, auto, variant } = req.body;
     try{
-        const card = new Card({name, cardNumber, auto, variant, owner});
+        const card = new Card({name, cardNumber, auto, variant});
         await card.save();
         res.status(201).send(card);
     } catch(e) {
@@ -50,9 +50,9 @@ app.post('/addCard', async (req, res) => {
 
 //delete card- real function
 app.delete('/cards', async (req, res) => {
-    const {name, cardNumber, auto, variant, owner} = req.body;
+    const {name, cardNumber, auto, variant } = req.body;
     try{
-        const card = Card.findOneAndDelete({name, cardNumber, auto, variant, owner});
+        const card = Card.findOneAndDelete({name, cardNumber, auto, variant });
 
         if(!card){
             return res.status(404).send('Card not found');
