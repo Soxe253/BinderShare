@@ -6,9 +6,8 @@ async function getCards(){
             console.error("Invalid data format: Expected an array in 'cards'");
             return;
         }
-        //if(card.owner == user?)
         console.log(data);
-        const item = document.getElementById('cards');
+        const item = document.getElementById('ddcard');
         data.cards.forEach(card => {
             const newElement = document.createElement("p");
             newElement.textContent = `
