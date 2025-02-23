@@ -1,0 +1,10 @@
+doctype html
+html
+  head
+    title My Collection
+  body
+    h1 My Card Collection
+    ul
+      each card in cards
+        li
+          a(href=`/card/${card._id}`) #{card.name}

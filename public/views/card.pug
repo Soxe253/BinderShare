@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title= card.name
+  body
+    h1= card.name
+    img(src=card.image, alt=card.name)
+    p Number: #{card.cardNumber}
+    p Auto: #{card.auto}
+    p Variant: #{card.variant}
+    a(href="/collection") Back to collection

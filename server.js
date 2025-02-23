@@ -4,7 +4,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import Card from './models/card.js';
-import { filterOptions } from 'mongodb/lib/utils.js';
 import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,14 +15,18 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 //static files
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.set('view engine', 'pug');
+app.set('views', __dirname + '/public/views'); 
+
 
 const dbURL = process.env.monConnect;
 mongoose.connect(dbURL);
 
 // go home 
 app.get('/home', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/home.html'));
+    res.sendFile(path.join(__dirname, 'views/home.html'));
 });
 
 //get cards
@@ -66,20 +69,20 @@ app.delete('/cards', async (req, res) => {
    
 });
 //add card- test function
-async function addCard(){
-    try{
-        const card = new Card ({
-            name: "testCard1",
-            cardNumber: "1/100",
-            auto: false,
-            variant: "Chrome"
-        });
-        await card.save();
-        console.log("card saved successfuly");
-    } catch(e){
-        console.log("error saving card", e);
-    }
-};
+// async function addCard(){
+//     try{
+//         const card = new Card ({
+//             name: "testCard1",
+//             cardNumber: "1/100",
+//             auto: false,
+//             variant: "Chrome"
+//         });
+//         await card.save();
+//         console.log("card saved successfuly");
+//     } catch(e){
+//         console.log("error saving card", e);
+//     }
+// };
 
 //addCard();
 
@@ -97,7 +100,7 @@ app.post('/login', (req,res) => {
 
 // send to login
 app.get('/', (req, res) => {
-    res.sendFile(path.join(path.resolve(), 'public/login.html'));
+    res.sendFile(path.join(path.resolve(), 'public/views/login.html'));
 });
 
 //delete
@@ -119,7 +122,20 @@ app.delete('/deleteCard', async (req, res) => {
     }
 });
 
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+//route for individual card
+app.get('/card/:id', async (req, res) => {
+    const card = await Card.findById(req.params.id);
+    if (!card) return res.status(404).send('Card not found');
+    res.render('card', { card });
 });
+
+// Collection route (list all cards)
+app.get('/collection', async (req, res) => {
+    const cards = await Card.find(); // Fetch all cards
+    res.render('collection', { cards });
+});
+
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running on port ${port}`);
+  });

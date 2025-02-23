@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if(response.ok) {
                 const result = await response.json();
                 console.log('username and password accepted'  + JSON.stringify(result));
-                window.location.href = '/home';
+                window.location.href = '../views/home.html';
             } else {
                 const errorT = await response.text();
                 console.log('error in username or password');
