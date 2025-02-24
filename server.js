@@ -29,6 +29,10 @@ app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, 'views/home.html'));
 });
 
+app.get('/user', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/views/user.html'));
+});
+
 //get cards
 app.get('/cards', async (req,res) => {
     try{
