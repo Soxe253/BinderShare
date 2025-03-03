@@ -17,7 +17,6 @@ app.use('/public', express.static('public'));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(formidable());
 
 
 //static files
@@ -210,7 +209,7 @@ app.get('/binder/:id', async (req,res) => {
 });
 
 //add card to a binder
-app.post('/add-to-binder', async (req, res) => {
+app.post('/add-to-binder', formidable(), async (req, res) => {
     const { cardId, binderId } = req.fields;
     
     try{  
