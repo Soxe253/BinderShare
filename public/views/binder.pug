@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    title= binder.name
+  body
+    h1= binder.name
+    h2
+      a(href='/collection') Back to Collection
+    h3 Cards in this binder:
+    if binder.cards.length > 0
+      ul
+        each card in binder.cards
+          li
+            a(href=`/card/${card._id}`)= card.name
+    else
+      p No cards in this binder yet.

@@ -9,3 +9,65 @@ html
     p Auto: #{card.auto}
     p Variant: #{card.variant}
     a(href="/collection") Back to collection
+
+    // Add the dropdown form here
+    form(id="addToBinderForm", method="POST")
+      // Hidden inputs for card and binder ObjectIds
+      input(type="hidden" name="cardId" value=card._id)
+      input(type="hidden" name="binderId" value="")
+      
+      label(for="binder") Select Binder:
+      select(name="binder" id="binder" onchange="updateBinderId()")
+        each binder in binders
+          option(value=binder._id)= binder.name
+          
+      button(type="submit") Add to Binder
+
+    // Success message (hidden initially)
+    div(id="successMessage", style="display: none;") Card added to binder successfully!
+
+    script.
+      // JavaScript for handling form submission via Fetch
+      function updateBinderId() {
+        const binderSelect = document.getElementById("binder");
+        const binderIdInput = document.querySelector("input[name='binderId']");
+        if (binderSelect && binderIdInput) {
+          binderIdInput.value = binderSelect.value;
+          console.log('Selected Binder ID:', binderSelect.value); // Log selected value
+        } else {
+          console.error('binderSelect or binderIdInput is null');
+        }
+      }
+
+      const form = document.getElementById("addToBinderForm");
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault(); // Prevent the form from submitting normally
+
+        const binderIdInput = document.querySelector("input[name='binderId']");
+        const cardIdInput = document.querySelector("input[name='cardId']");
+
+        // Log the values before submission
+        console.log('cardId:', cardIdInput.value);
+        console.log('binderId:', binderIdInput.value);
+
+        const formData = new FormData(form);
+
+        // Logging FormData to ensure it contains the correct values
+        console.log('Form Data:', [...formData.entries()]);
+
+        try {
+          const response = await fetch('/add-to-binder', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (response.ok) {
+            location.reload(); // Reload the page after a successful submission
+          } else {
+            alert('There was an error adding the card to the binder.');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('There was an error adding the card to the binder.');
+        }
+      });

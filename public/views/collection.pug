@@ -6,6 +6,10 @@ html
     h1 My Card Collection
     h2
       a(href='/user') Back to User
+      ul
+      each binder in binders
+        li
+          a(href=`/binder/${binder._id}`) #{binder.name}
     ul
       each card in cards
         li

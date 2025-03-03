@@ -3,7 +3,10 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
+import formidable from 'express-formidable';
 import Card from './models/card.js';
+import User from './models/user.js';
+import Binder from './models/binder.js';
 import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +16,9 @@ const app = express();
 app.use('/public', express.static('public'));
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(formidable());
+
 
 //static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -36,10 +42,11 @@ app.get('/user', (req, res) => {
 //get cards
 app.get('/cards', async (req,res) => {
     try{
-        const cards = await Card.find();
-        res.json({cards});
+        const userName = admin.username;
+        const user = await User.findOne({ name: userName }).populate('cards');
+        res.json(user.cards);
     }catch(e){
-        res.status(500).send(error.message);
+        res.status(500).send(e.message);
     }
 });
 
@@ -50,13 +57,18 @@ app.post('/addCard', async (req, res) => {
     try{
         const card = new Card({name, cardNumber, auto, variant, owner});
         await card.save();
+        const userName = admin.username;
+        await User.updateOne(
+            { name: userName },
+            { $push: { cards: card._id.toString() } }
+        );
         res.status(201).send(card);
     } catch(e) {
         res.status(400).send(e.message);
     }
 });
 
-//delete card- real function
+//delete card- real function - not in use?
 app.delete('/cards', async (req, res) => {
     const {name, cardNumber, auto, variant, owner } = req.body;
     try{
@@ -72,23 +84,22 @@ app.delete('/cards', async (req, res) => {
     }
    
 });
-//add card- test function
-// async function addCard(){
-//     try{
-//         const card = new Card ({
-//             name: "testCard1",
-//             cardNumber: "1/100",
-//             auto: false,
-//             variant: "Chrome"
-//         });
-//         await card.save();
-//         console.log("card saved successfuly");
-//     } catch(e){
-//         console.log("error saving card", e);
-//     }
-// };
 
-//addCard();
+async function addUser(){
+    try{
+        const user = new User ({
+            name: "soxe",
+            cards: [],
+            binders: []
+        });
+        await user.save();
+        console.log("user saved successfuly");
+    } catch(e){
+        console.log("error saving user", e);
+    }
+};
+
+//addUser();
 
 //login check
 //hardcoded login
@@ -115,7 +126,11 @@ app.delete('/deleteCard', async (req, res) => {
 
         // Remove the card
         const card = await Card.findByIdAndDelete(cardID);
-
+        const userName = admin.username;
+        await User.updateOne(
+            { name: userName },
+            { $pull: { cards: card._id.toString() } }
+        );
         if (!card) {
             return res.status(404).json({ message: "Card not found" });
         }
@@ -126,18 +141,109 @@ app.delete('/deleteCard', async (req, res) => {
     }
 });
 
+//add a binder
+app.post('/addBinder', async (req, res) => {
+    console.log("Received data:", req.body); 
+    const {name} = req.body;
+    const userName = admin.username;
+    const user = await User.findOne({ name: userName })
+    console.log('user id: ' + user._id);
+    try{
+        const binder = new Binder({
+            name,
+            cards: [],
+            owner: user._id
+        })
+        console.log(binder);
+        await binder.save();
+        await User.updateOne(
+            { name: userName },
+            { $push: { binders: binder._id } }  // Push the binder's ObjectId to the binders array
+        );
+        res.status(201).send(binder);
+    } catch(e) {
+        res.status(400).send(e.message);
+    }
+});
+
 //route for individual card
 app.get('/card/:id', async (req, res) => {
-    const card = await Card.findById(req.params.id);
-    if (!card) return res.status(404).send('Card not found');
-    res.render('card', { card });
+    try{
+        const userName = admin.username;
+        const user = await User.findOne({ name: userName }).populate('cards');
+        const card = user.cards.find(card => card._id.toString() === req.params.id);
+        await user.populate('binders');
+        if (!card) return res.status(404).send('Card not found');
+        res.render('card', { card, binders: user.binders });
+    }catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 // Collection route (list all cards)
 app.get('/collection', async (req, res) => {
-    const cards = await Card.find(); // Fetch all cards
-    res.render('collection', { cards });
+    const userName = admin.username;
+    const user = await User.findOne({ name: userName }).populate('cards');
+    await user.populate('binders');
+    res.render('collection', { cards: user.cards, binders: user.binders });
 });
+
+//Binders route
+app.get('/binder/:id', async (req,res) => {
+    try{
+        const userName = admin.username;
+        //find user and pop binders then cards in binder
+        const user = await User.findOne({ name: userName })
+            .populate({
+                path: 'binders',
+                populate: { path: 'cards' } // Populate the cards inside each binder
+            });
+
+        const binder = user.binders.find(binder => binder._id.toString() === req.params.id);
+        if (!binder) return res.status(404).send('Binder not found');
+        res.render('binder', { binder });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+//add card to a binder
+app.post('/add-to-binder', async (req, res) => {
+    const { cardId, binderId } = req.fields;
+    
+    try{  
+        console.log('cardId:', cardId);
+        console.log('binderId:', binderId);
+  
+        const userName = admin.username;
+        const user = await User.findOne({ name: userName }).populate('binders');
+        
+        const binder = user.binders.find(b => b._id.toString() === binderId);
+
+        if (!binder) {
+            return res.status(404).send('Binder not found');
+        }
+
+        const card = await Card.findById(cardId);
+
+        if (!card) {
+            return res.status(404).send('Card not found');
+        }
+
+        await binder.updateOne(
+            { $push: { cards: card._id } }
+        );
+
+    res.status(200).send('Card added to binder');
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error adding card to binder');
+      }
+  });
+  
 
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0', () => {

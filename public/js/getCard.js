@@ -12,7 +12,7 @@ async function getCards(){
 async function gotCards(){
     const data = await getCards();
     console.log(data);
-    const cards = data.cards;
+    const cards = data;
     const dropdown = document.getElementById('ddcard');
     const names = [];
     const ids = [];

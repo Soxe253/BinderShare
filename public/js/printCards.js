@@ -2,13 +2,13 @@ async function getCards(){
     try{
         const response = await fetch('/cards');
         const data = await response.json();
-        if (!data.cards || !Array.isArray(data.cards)) {
+        if (!Array.isArray(data)) {
             console.error("Invalid data format: Expected an array in 'cards'");
             return;
         }
         console.log(data);
         const item = document.getElementById('cards');
-        data.cards.forEach(card => {
+        data.forEach(card => {
             const newElement = document.createElement("p");
             newElement.textContent = `
                 name: ${card.name}, 
