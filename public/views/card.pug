@@ -2,29 +2,39 @@ doctype html
 html
   head
     title= card.name
+    link(rel='stylesheet', href='../css/card.css')
   body
-    h1= card.name
-    img(src=card.image, alt=card.name)
-    p Number: #{card.cardNumber}
-    p Auto: #{card.auto}
-    p Variant: #{card.variant}
-    a(href="/collection") Back to collection
+    // Card View
+    .card-container
+      // Image Box on the Left
+      .card-image
+        img(src=card.image, alt=card.name)
 
-    // Add the dropdown form here
-    form(id="addToBinderForm", method="POST")
-      // Hidden inputs for card and binder ObjectIds
-      input(type="hidden" name="cardId" value=card._id)
-      input(type="hidden" name="binderId" value="")
-      
-      label(for="binder") Select Binder:
-      select(name="binder" id="binder" onchange="updateBinderId()")
-        each binder in binders
-          option(value=binder._id)= binder.name
-          
-      button(type="submit") Add to Binder
+      // Attributes Section on the Right
+      .card-details
+        h1= card.name
+        p Number: #{card.cardNumber}
+        p Auto: #{card.auto ? 'Yes' : 'No'}
+        p Variant: #{card.variant}
 
-    // Success message (hidden initially)
-    div(id="successMessage", style="display: none;") Card added to binder successfully!
+        // Add to Binder Form
+        form(id="addToBinderForm", method="POST")
+          input(type="hidden" name="cardId" value=card._id)
+          input(type="hidden" name="binderId" value="")
+
+          label(for="binder") Select Binder:
+          select(name="binder" id="binder" onchange="updateBinderId()")
+            option(value="" disabled selected) -- Select Binder --
+             each binder in binders
+                option(value=binder._id)= binder.name
+
+          button(type="submit") Add to Binder
+
+        // Success message (hidden initially)
+        div(id="successMessage", style="display: none;") Card added to binder successfully!
+
+        // Link to go back to the collection
+        a(href="/collection") Back to Collection
 
     script.
       // JavaScript for handling form submission via Fetch

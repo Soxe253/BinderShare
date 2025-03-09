@@ -1,4 +1,4 @@
-async function getCards(){
+async function getCards(){//gets and puts all cards in a dropdown
     try{
         const response = await fetch('/cards');
         const data = await response.json();

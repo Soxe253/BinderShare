@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html kang = "en">
+    <head>
+        <link rel="stylesheet" href="../css/user.css">
+    </head>
     <body>
-        User Page
-        <a href = "/collection">Collection</a>
-        <div id = "cards">
-            
+        <div class="top-bar">
+            <div class="top-bar-wrapper">
+                <div class="page-title">User Page</div>
+                <div class="collection-link">
+                    <a href="/collection">Collection</a>
+                </div>
+            </div>
         </div>
+    <div class = "container">
         <div>
             <form id = "deleteCard">
                 <div>
@@ -44,11 +51,22 @@
                 <button type = "submit" id = "binderSubmit">Add Binder</button>
             </form>
         </div>
-        <script src = "/js/printCards.js"></script>
-        <script src="/js/getCard.js"></script>
+        <div>
+            <form id = "deleteBinder">
+                <label for = "binder">Binder to Delete: </label>
+                <select name="dbinder" id="dbinder">
+                </select>
+
+                <button type="submit" id="binderDelete">Delete Binder</button>
+            </form>
+        </div>
+    </div>
+    <script src="/js/getCard.js"></script>
     <script src = "/js/addCard.js"></script>
     <script src = "/js/deleteCard.js"></script>
     <script src = "/js/addBinder.js"></script>
+    <script src="/js/deleteBinder.js"></script>
+    <script src="/js/getBinder.js"></script>
     </body>
     
 </html>

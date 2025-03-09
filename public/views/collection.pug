@@ -2,15 +2,21 @@ doctype html
 html
   head
     title My Collection
+    link(rel='stylesheet', href= "../css/collection.css")
   body
-    h1 My Card Collection
-    h2
-      a(href='/user') Back to User
-      ul
+    // Top Bar
+    .top-bar
+      h1 My Collection
+    
+    // Binders Row
+    .binders-row
       each binder in binders
-        li
+        .binder
           a(href=`/binder/${binder._id}`) #{binder.name}
-    ul
+
+    // Cards Grid
+    .cards-grid
       each card in cards
-        li
-          a(href=`/card/${card._id}`) #{card.name}
+        .card
+          a(href=`/card/${card._id}`)
+            img(src=`/images/${card.image}` alt=card.name)

@@ -2,15 +2,44 @@ doctype html
 html
   head
     title= binder.name
+    link(rel='stylesheet', href='../css/binder.css')
+    script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+    script.
+      $(document).ready(function() {
+        $('.remove-card').on('change', function() {
+          const cardId = $(this).data('card-id');
+          const binderId = $(this).data('binder-id');
+          if ($(this).val() === 'remove') {
+            $.ajax({
+              url: `/binder/${binderId}/remove-card/${cardId}`,
+              type: 'POST',
+              success: function() {
+                location.reload();
+              }
+            });
+          }
+        });
+      });
+
   body
-    h1= binder.name
+    .top-bar
+      h1= binder.name
+
     h2
       a(href='/collection') Back to Collection
+
     h3 Cards in this binder:
-    if binder.cards.length > 0
-      ul
+    
+    .cards-grid
+      if binder.cards.length > 0
         each card in binder.cards
-          li
-            a(href=`/card/${card._id}`)= card.name
-    else
-      p No cards in this binder yet.
+          .card
+            a(href=`/card/${card._id}`)
+              img(src=`/images/${card.image}` alt=card.name)
+
+            // Dropdown for removing a card
+            select.remove-card(data-card-id=card._id data-binder-id=binder._id)
+              option(value="") Actions
+              option(value="remove") Remove from Binder
+      else
+        p No cards in this binder yet.

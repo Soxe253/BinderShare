@@ -1,4 +1,4 @@
-async function getCards(){
+async function getCards(){//gets and prints all cards attributes to screen
     try{
         const response = await fetch('/cards');
         const data = await response.json();

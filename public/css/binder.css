@@ -1,0 +1,70 @@
+/* Reset default margin and padding */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: rgb(3,67,3);
+}
+
+/* Top bar containing the binder's name */
+.top-bar {
+    display: flex;
+    justify-content: center; /* Centers the title */
+    align-items: center;
+    background-color: rgb(37,130,37);
+    color: white;
+    padding: 15px 20px;
+    font-size: 24px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Wrapper for the cards grid */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjusts number of columns based on screen size */
+    gap: 20px; /* Adds space between the cards */
+    margin: 20px;
+    padding: 80px 20px 20px; /* Prevent overlap with top bar */
+}
+
+/* Individual card styling */
+.card {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.card p {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Link styling for card names */
+.card a {
+    text-decoration: none;
+    color: #333;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Fewer cards per row on smaller screens */
+    }
+}

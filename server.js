@@ -49,6 +49,17 @@ app.get('/cards', async (req,res) => {
     }
 });
 
+//get binders
+app.get('/binders', async (req,res) => {
+    try{
+        const userName = admin.username;
+        const user = await User.findOne({ name: userName }).populate('binders');
+        res.json(user.binders);
+    }catch(e){
+        res.status(500).send(e.message);
+    }
+});
+
 //add card- real function
 app.post('/addCard', async (req, res) => {
     console.log("Received data:", req.body); 
@@ -164,6 +175,28 @@ app.post('/addBinder', async (req, res) => {
         res.status(400).send(e.message);
     }
 });
+//delete a binder from db and user
+app.delete('/deleteBinder', async (req, res) => {
+    try {
+        console.log("Request Body:", req.body);
+        const {binderID} = req.body;
+
+        // Remove the card
+        const binder = await Binder.findByIdAndDelete(binderID);
+        const userName = admin.username;
+        await User.updateOne(
+            { name: userName },
+            { $pull: { binders: binder._id.toString() } }
+        );
+        if (!binder) {
+            return res.status(404).json({ message: "Binder not found" });
+        }
+
+        res.json({ message: "Binder deleted successfully", binderID });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
 
 //route for individual card
 app.get('/card/:id', async (req, res) => {
@@ -241,6 +274,12 @@ app.post('/add-to-binder', formidable(), async (req, res) => {
         console.error(err);
         res.status(500).send('Error adding card to binder');
       }
+  });
+
+app.post('/binder/:binderId/remove-card/:cardId', async (req, res) => {
+    const { binderId, cardId } = req.params;
+    await Binder.findByIdAndUpdate(binderId, { $pull: { cards: cardId } });
+    res.sendStatus(200);
   });
   
 
