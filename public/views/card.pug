@@ -13,6 +13,7 @@ html
       // Attributes Section on the Right
       .card-details
         h1= card.name
+        p Set: #{card.set}
         p Number: #{card.cardNumber}
         p Auto: #{card.auto ? 'Yes' : 'No'}
         p Variant: #{card.variant}
@@ -25,8 +26,8 @@ html
           label(for="binder") Select Binder:
           select(name="binder" id="binder" onchange="updateBinderId()")
             option(value="" disabled selected) -- Select Binder --
-             each binder in binders
-                option(value=binder._id)= binder.name
+            each binder in binders
+              option(value=binder._id)= binder.name
 
           button(type="submit") Add to Binder
 
@@ -37,47 +38,50 @@ html
         a(href="/collection") Back to Collection
 
     script.
-      // JavaScript for handling form submission via Fetch
       function updateBinderId() {
         const binderSelect = document.getElementById("binder");
         const binderIdInput = document.querySelector("input[name='binderId']");
         if (binderSelect && binderIdInput) {
           binderIdInput.value = binderSelect.value;
-          console.log('Selected Binder ID:', binderSelect.value); // Log selected value
-        } else {
-          console.error('binderSelect or binderIdInput is null');
         }
       }
 
-      const form = document.getElementById("addToBinderForm");
-      form.addEventListener("submit", async function (e) {
-        e.preventDefault(); // Prevent the form from submitting normally
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("addToBinderForm").addEventListener("submit", async function (e) {
+          e.preventDefault(); 
 
-        const binderIdInput = document.querySelector("input[name='binderId']");
-        const cardIdInput = document.querySelector("input[name='cardId']");
+          const binderId = document.querySelector("input[name='binderId']").value;
+          const cardId = document.querySelector("input[name='cardId']").value;
 
-        // Log the values before submission
-        console.log('cardId:', cardIdInput.value);
-        console.log('binderId:', binderIdInput.value);
-
-        const formData = new FormData(form);
-
-        // Logging FormData to ensure it contains the correct values
-        console.log('Form Data:', [...formData.entries()]);
-
-        try {
-          const response = await fetch('/add-to-binder', {
-            method: 'POST',
-            body: formData
-          });
-
-          if (response.ok) {
-            location.reload(); // Reload the page after a successful submission
-          } else {
-            alert('There was an error adding the card to the binder.');
+          if (!binderId) {
+            alert('Please select a binder.');
+            return;
           }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('There was an error adding the card to the binder.');
-        }
+
+          try {
+            console.log('Submitting request:', { binderId, cardId });
+
+            const formData = new FormData();
+            formData.append("binderId", binderId);
+            formData.append("cardId", cardId);
+
+            const response = await fetch('/add-to-binder', {
+              method: 'POST',
+              body: formData
+            });
+
+            const result = await response.json();
+            console.log('Response received:', result);
+
+            if (response.ok) {
+              document.getElementById("successMessage").style.display = "block";
+              setTimeout(() => location.reload(), 1000);
+            } else {
+              alert(result.error || 'Error adding card to binder.');
+            }
+          } catch (error) {
+            console.error('Fetch error:', error);
+            alert('An error occurred while adding the card.');
+          }
+        });
       });

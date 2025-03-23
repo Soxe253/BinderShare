@@ -11,7 +11,8 @@ async function getCards(){//gets and prints all cards attributes to screen
         data.forEach(card => {
             const newElement = document.createElement("p");
             newElement.textContent = `
-                name: ${card.name}, 
+                name: ${card.name},
+                Set: ${card.set}, 
                 Card Number: ${card.cardNumber}, 
                 Auto: ${card.auto ? 'Yes' : 'No'}, 
                 Variant: ${card.variant || 'N/A'},

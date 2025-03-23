@@ -7,7 +7,9 @@ html
     // Top Bar
     .top-bar
       h1 My Collection
-    
+      // Add a simple link to go back to the user page
+      a(href='/user') Back to User
+
     // Binders Row
     .binders-row
       each binder in binders
@@ -19,4 +21,4 @@ html
       each card in cards
         .card
           a(href=`/card/${card._id}`)
-            img(src=`/images/${card.image}` alt=card.name)
+            img(src=`${card.image}` alt=card.name)

@@ -35,7 +35,7 @@ html
         each card in binder.cards
           .card
             a(href=`/card/${card._id}`)
-              img(src=`/images/${card.image}` alt=card.name)
+              img(src=`${card.image}` alt=card.name)
 
             // Dropdown for removing a card
             select.remove-card(data-card-id=card._id data-binder-id=binder._id)

@@ -7,6 +7,8 @@ import formidable from 'express-formidable';
 import Card from './models/card.js';
 import User from './models/user.js';
 import Binder from './models/binder.js';
+import fs from 'fs';
+import fetch from 'node-fetch';
 import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -27,6 +29,7 @@ app.set('views', __dirname + '/public/views');
 
 
 const dbURL = process.env.monConnect;
+const pokemonKey = process.env.pokemontcg;
 mongoose.connect(dbURL);
 
 // go home 
@@ -60,29 +63,114 @@ app.get('/binders', async (req,res) => {
     }
 });
 
+//test for api
+async function getCardLargeImage(cardId) {
+    const url = `https://api.pokemontcg.io/v2/cards/${cardId}?select=images`;
+  
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-Api-Key': pokemonKey,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error fetching card: ${response.statusText}`);
+      }
+  
+      const cardData = await response.json();
+  
+      // Extract the large image URL from the response
+      const largeImageUrl = cardData.data.images.large;
+  
+      return largeImageUrl; // Return the large image URL
+  
+    } catch (error) {
+      console.error('Error fetching card data:', error);
+      return null; // Return null if there's an error
+    }
+  }
+  
+
 //add card- real function
 app.post('/addCard', async (req, res) => {
     console.log("Received data:", req.body); 
-    const {name, cardNumber, auto, variant, owner } = req.body;
-    try{
-        const card = new Card({name, cardNumber, auto, variant, owner});
+    const {name, set, cardNumber, auto, variant, owner } = req.body;
+
+    const tempSet = set.split(" ");
+    const tempNum = cardNumber.split("/");
+    
+    const cardId = tempSet[1] + "-" + tempNum[0];
+    console.log("cardID " + cardId);
+    
+    try {
+        // Fetch the large image URL using the cardId
+        const largeImageUrl = await getCardLargeImage(cardId);
+        
+        // Create the card object including the image URL
+        const card = new Card({
+            name,
+            set,
+            cardNumber,
+            auto,
+            variant,
+            image: largeImageUrl,
+            owner
+        });
+
+        // Save the card to the database
         await card.save();
+
+        // Add the card to the user's collection
         const userName = admin.username;
         await User.updateOne(
             { name: userName },
             { $push: { cards: card._id.toString() } }
         );
+
+        // Respond with the created card
         res.status(201).send(card);
-    } catch(e) {
+    } catch (e) {
         res.status(400).send(e.message);
     }
 });
 
+//get all pokemon card names
+app.get('/card-names', (req, res) => {
+    const filePath = path.join(__dirname, 'pokemonNames.txt');
+    
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            return res.status(500).json({ error: 'Failed to read card names' });
+        }
+
+        const cardNames = data.split('\n').map(name => name.trim()).filter(name => name);
+        res.json(cardNames);
+    });
+});
+
+//get all pokemon card set names
+app.get('/set-names', (req, res) => {
+    const filePath = path.join(__dirname, 'pokemonSets.txt');
+    
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            return res.status(500).json({ error: 'Failed to read card names' });
+        }
+
+        const setNames = data.split('\n').map(name => name.trim()).filter(name => name);
+        res.json(setNames);
+    });
+});
+
 //delete card- real function - not in use?
 app.delete('/cards', async (req, res) => {
-    const {name, cardNumber, auto, variant, owner } = req.body;
+    const {name, set, cardNumber, auto, variant, owner } = req.body;
     try{
-        const card = Card.findOneAndDelete({name, cardNumber, auto, variant, owner });
+        const card = Card.findOneAndDelete({name, set, cardNumber, auto, variant, owner });
 
         if(!card){
             return res.status(404).send('Card not found');
@@ -245,7 +333,7 @@ app.get('/binder/:id', async (req,res) => {
 app.post('/add-to-binder', formidable(), async (req, res) => {
     const { cardId, binderId } = req.fields;
     
-    try{  
+    try {  
         console.log('cardId:', cardId);
         console.log('binderId:', binderId);
   
@@ -255,26 +343,32 @@ app.post('/add-to-binder', formidable(), async (req, res) => {
         const binder = user.binders.find(b => b._id.toString() === binderId);
 
         if (!binder) {
-            return res.status(404).send('Binder not found');
+            return res.status(404).json({ error: 'Binder not found' });
         }
 
         const card = await Card.findById(cardId);
-
         if (!card) {
-            return res.status(404).send('Card not found');
+            return res.status(404).json({ error: 'Card not found' });
         }
 
-        await binder.updateOne(
-            { $push: { cards: card._id } }
-        );
+        // **Check if card already exists in the binder**
+        const cardExists = binder.cards.some(c => c.toString() === card._id.toString());
 
-    res.status(200).send('Card added to binder');
+        if (cardExists) {
+            return res.status(400).json({ error: 'Card is already in this binder' });
+        }
+
+        // **Add the card only if it's not already present**
+        await binder.updateOne({ $push: { cards: card._id } });
+
+        res.status(200).json({ message: 'Card added to binder' });
 
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error adding card to binder');
-      }
-  });
+        res.status(500).json({ error: 'Error adding card to binder' });
+    }
+});
+
 
 app.post('/binder/:binderId/remove-card/:cardId', async (req, res) => {
     const { binderId, cardId } = req.params;
