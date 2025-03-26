@@ -63,7 +63,7 @@ app.get('/binders', async (req,res) => {
     }
 });
 
-//test for api
+//get card image
 async function getCardLargeImage(cardId) {
     const url = `https://api.pokemontcg.io/v2/cards/${cardId}?select=images`;
   

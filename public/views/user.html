@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html kang = "en">
+<html lang="en">
     <head>
         <link rel="stylesheet" href="../css/user.css">
     </head>
@@ -12,68 +12,79 @@
                 </div>
             </div>
         </div>
-    <div class = "container">
-        <div>
-            <form id = "deleteCard">
-                <div>
-                    <label for="ddcard">Cards:</label>
-                    <select name="ddcard" id="ddcard">
-                    </select>
-                </div>
-                <button type = "submit" id ="deleteSubmit">Delete Card</button>
-            </form>
-        </div>
-        <div>
-            <form id = "addCard">
-                <label for="name">Card Name:</label>
-                <input type="text" id="name" name="name" oninput="showCardDropdown()" autocomplete="off">
-                <ul id="cardDropdown" style="display: none; position: absolute; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto;"></ul>
+        <div class="container">
+            <div>
+                <form id="deleteCard">
+                    <div>
+                        <label for="ddcard">Cards:</label>
+                        <select name="ddcard" id="ddcard"></select>
+                    </div>
+                    <button type="submit" id="deleteSubmit">Delete Card</button>
+                </form>
+            </div>
+            <div>
+                <form id="addCard">
+                    <div>
+                        <label for="name">Card Name:</label>
+                        <input type="text" id="name" name="name" oninput="showCardDropdown()" autocomplete="off">
+                    </div>
+                    <ul id="cardDropdown"></ul>
 
-                <label for="set">Set:</label>
-                <input type="text" id="set" name="set" oninput="showSetDropdown()" autocomplete="off">
-                <ul id="setDropdown" style="display: none; position: absolute; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto;"></ul>
+                    <div>
+                        <label for="set">Set:</label>
+                        <input type="text" id="set" name="set" oninput="showSetDropdown()" autocomplete="off">
+                    </div>
+                    <ul id="setDropdown"></ul>
     
-                <label for = "cardNumber"> Card Number: </label>
-                <input type="text" id="cardNumber" name="cardNumber" required><br><br>
+                    <div>
+                        <label for="cardNumber">Card Number:</label>
+                        <input type="text" id="cardNumber" name="cardNumber" required>
+                    </div>
     
-                <label for = "auto">Autographed?: </label>
-                <input type="checkbox" id="auto" name="auto"><br><br>
+                    <div>
+                        <label for="auto">Autographed?:</label>
+                        <input type="checkbox" id="auto" name="auto">
+                    </div>
     
-                <label for = "variant">Variants: </label>
-                <input type="text" id="variant" name="variant" required><br><br>
+                    <div>
+                        <label for="variant">Variants:</label>
+                        <input type="text" id="variant" name="variant" required>
+                    </div>
     
-                <label for = "owner">Owner: </label>
-                <input type="text" id="owner" name="owner" required><br><br>
+                    <div>
+                        <label for="owner">Owner:</label>
+                        <input type="text" id="owner" name="owner" required>
+                    </div>
     
-                <button type = "submit" id = "addSubmit">Add Card</button>
-            </form>
+                    <button type="submit" id="addSubmit">Add Card</button>
+                </form>
+            </div>
+            <div>
+                <form id="addBinder">
+                    <div>
+                        <label for="bname">Name:</label>
+                        <input type="text" id="bname" name="bname" required>
+                    </div>
+                    <button type="submit" id="binderSubmit">Add Binder</button>
+                </form>
+            </div>
+            <div>
+                <form id="deleteBinder">
+                    <div>
+                        <label for="dbinder">Binder to Delete:</label>
+                        <select name="dbinder" id="dbinder"></select>
+                    </div>
+                    <button type="submit" id="binderDelete">Delete Binder</button>
+                </form>
+            </div>
         </div>
-        <div>
-            <form id = "addBinder">
-                <label for = "name">Name: </label>
-                <input type = "text" id="bname" name="bname" required><br><br>
-
-                <button type = "submit" id = "binderSubmit">Add Binder</button>
-            </form>
-        </div>
-        <div>
-            <form id = "deleteBinder">
-                <label for = "binder">Binder to Delete: </label>
-                <select name="dbinder" id="dbinder">
-                </select>
-
-                <button type="submit" id="binderDelete">Delete Binder</button>
-            </form>
-        </div>
-    </div>
-    <script src="/js/getPokemonNames.js"></script>
-    <script src="/js/getPokemonSets.js"></script>
-    <script src="/js/getCard.js"></script>
-    <script src = "/js/addCard.js"></script>
-    <script src = "/js/deleteCard.js"></script>
-    <script src = "/js/addBinder.js"></script>
-    <script src="/js/deleteBinder.js"></script>
-    <script src="/js/getBinder.js"></script>
+        <script src="/js/getPokemonNames.js"></script>
+        <script src="/js/getPokemonSets.js"></script>
+        <script src="/js/getCard.js"></script>
+        <script src="/js/addCard.js"></script>
+        <script src="/js/deleteCard.js"></script>
+        <script src="/js/addBinder.js"></script>
+        <script src="/js/deleteBinder.js"></script>
+        <script src="/js/getBinder.js"></script>
     </body>
-    
 </html>
