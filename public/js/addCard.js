@@ -6,10 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const name = document.getElementById("name").value;
         const set = document.getElementById("set").value;
-        const cardNumber = document.getElementById("cardNumber").value;
+        const cardNumber = document.getElementById("cardNumber").value.toUpperCase();
         const auto = document.getElementById("auto").checked;
         const variant = document.getElementById("variant").value;
         const owner = document.getElementById("owner").value;
+
 
         const data = {name, set, cardNumber, auto, variant, owner};
         console.log(owner);

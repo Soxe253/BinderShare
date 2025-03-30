@@ -34,6 +34,9 @@ html
         // Success message (hidden initially)
         div(id="successMessage", style="display: none;") Card added to binder successfully!
 
+        // Delete Button
+        button(id="deleteCardButton", type="button", onclick="deleteCard()") Delete Card
+
         // Link to go back to the collection
         a(href="/collection") Back to Collection
 
@@ -85,3 +88,31 @@ html
           }
         });
       });
+
+      async function deleteCard() {
+        if (!confirm("Are you sure you want to delete this card?")) return;
+
+        const cardId = document.querySelector("input[name='cardId']").value;
+
+        try {
+          const response = await fetch('/deleteCard', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ cardID: cardId })
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            alert('Card deleted successfully!');
+            window.location.href = "/collection"; // Redirect to collection page
+          } else {
+            alert(result.error || 'Error deleting card.');
+          }
+        } catch (error) {
+          console.error('Delete request failed:', error);
+          alert('An error occurred while deleting the card.');
+        }
+      }
