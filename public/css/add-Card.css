@@ -2,6 +2,7 @@
     body{
         background-color: rgb(3,67,3);
         color: white;
+        font-family: Arial, sans-serif;
     }
     .card-grid {
         display: grid;
@@ -44,4 +45,19 @@
 
     .card img:hover {
         transform: scale(1.05); /* Slight zoom on hover */
+    }
+
+    .card:hover {
+        background: #d3d3d3; /* Light grey */
+        transform: scale(1.03); /* Slightly enlarges the card for emphasis */
+        transition: background 0.3s, transform 0.2s; /* Smooth transition */
+    }
+
+    .card:active {
+        background: #b0b0b0; /* Darker grey when clicked */
+        transform: scale(0.98); /* Slightly shrink to mimic a button press */
+    }
+
+    .card img:active {
+        transform: scale(0.98);
     }
