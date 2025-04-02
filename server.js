@@ -41,6 +41,10 @@ app.get('/user', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/views/user.html'));
 });
 
+app.get('/add-Card', (req,res) => {
+    res.sendFile(path.join(__dirname, 'public/views/add-Card.html'));
+})
+
 //get cards
 app.get('/cards', async (req,res) => {
     try{
@@ -135,6 +139,51 @@ app.post('/addCard', async (req, res) => {
         res.status(400).send(e.message);
     }
 });
+
+app.post("/add-to-collection", async (req, res) => {
+    try {
+        const { cardId } = req.body;
+        if (!cardId) return res.status(400).json({ error: "Missing card ID." });
+
+        // Fetch the card data from the Pokémon TCG API
+        const apiUrl = `https://api.pokemontcg.io/v2/cards/${cardId}`;
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Failed to fetch card data.");
+
+        const data = await response.json();
+        const card = data.data;
+
+        if (!card) return res.status(404).json({ error: "Card not found." });
+
+        const number = card.number + "/" + card.set?.printedTotal;
+
+        const newCard = new Card({
+            name: card.name,
+            set: card.set?.name,
+            cardNumber: number,
+            auto: false,
+            variant: card.rarity || "none",
+            image: card.images?.large,
+            owner: admin.username
+        });
+
+        await newCard.save();
+
+        // Add the card to the user's collection
+        const userName = admin.username;
+        await User.updateOne(
+            { name: userName },
+            { $push: { cards: newCard._id.toString() } }
+        );
+
+        // Respond with the created card
+        res.status(201).send(newCard);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error." });
+    }
+});
+
 
 //get all pokemon card names
 app.get('/card-names', (req, res) => {

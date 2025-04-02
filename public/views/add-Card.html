@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/add-Card.css">
+    <title>Add Card</title>
+</head>
+<body>
+    <h1>Add a New Card</h1>
+    <h1><a href="/user" class="back">Back to User</a></h1>
+    <form>
+        <div>
+            <label for="name">Card Name:</label>
+            <input type="text" id="name" name="name" oninput="showCardDropdown()" autocomplete="off">
+        </div>
+        <ul id="cardDropdown"></ul>
+
+        <label for="cardNumber">Card Number:</label><br>
+        <input type="text" id="cardNumber" name="cardNumber"><br>
+
+        <button type="submit">Search</button>
+    </form>
+    <div id="results" class="card-grid"></div>
+    <script src="/js/getPokemonNames.js"></script>
+    <script src="/js/findCards.js"></script>
+</body>
+</html>
