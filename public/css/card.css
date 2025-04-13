@@ -7,13 +7,14 @@ body {
     color: white;
 }
 
-/* Container to hold the image and attributes */
+/* Container to hold the image and attributes side by side */
 .card-container {
     display: flex;
-    padding: 20px;
-    justify-content: center;
+    flex-direction: row; /* Horizontal layout */
+    justify-content: flex-start;
     align-items: flex-start;
     height: 100vh;
+    padding: 20px;
     box-sizing: border-box;
 }
 
@@ -36,6 +37,8 @@ body {
     flex: 1;
     max-width: 50%;
     padding-left: 20px;
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
 }
 
 /* Styling for card details */
@@ -52,6 +55,7 @@ body {
 /* Styling for the form and button */
 form {
     margin-top: 20px;
+    width: 100%;
 }
 
 form label {
@@ -64,17 +68,22 @@ form select {
     padding: 5px;
 }
 
-form button {
+/* Styling for buttons */
+form button,
+#deleteCardButton {
     margin-top: 10px;
-    padding: 10px;
+    padding: 10px 20px; /* Narrower button */
     background-color: #333;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    display: inline-block; /* Don’t stretch full width */
 }
 
-form button:hover {
+/* Hover effect for buttons */
+form button:hover,
+#deleteCardButton:hover {
     background-color: #555;
 }
 
@@ -90,10 +99,27 @@ a {
     display: block;
     margin-top: 20px;
     font-size: 1.2rem;
-    color: orange;
+    color: white;
+    background-color: orange;
+    padding: 10px 20px;
+    border-radius: 5px;
     text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+/* Hover effect */
 a:hover {
-    text-decoration: underline;
+    background-color: darkorange;
+    transform: scale(1.05);
+}
+
+/* Space between delete button and link */
+#deleteCardButton {
+    margin-bottom: 10px;
+}
+
+.card-details button,
+.card-details a {
+    align-self: flex-start; /* Or use center if you'd rather center them */
 }

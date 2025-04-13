@@ -23,6 +23,26 @@ body {
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+.back-to-collection {
+    position: absolute;
+    right: 50px; /* Adjusted distance from the right edge */
+    top: 50%;
+    transform: translateY(-50%); /* Vertically centers the button */
+    padding: 8px 12px; /* Reduced padding for smaller button size */
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px; /* Adjust font size for better balance */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.back-to-collection:hover {
+    background-color: #f0f0f0; /* Optional hover effect */
+}
+
 /* Wrapper for the cards grid */
 .cards-grid {
     display: grid;

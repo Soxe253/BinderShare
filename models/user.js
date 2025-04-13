@@ -3,6 +3,7 @@ const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
     name: { type: String, required: true },
+    password: { type: String, required: true},
     cards: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Card' }
     ],

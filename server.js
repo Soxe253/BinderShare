@@ -10,6 +10,9 @@ import Binder from './models/binder.js';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import 'dotenv/config';
+import bcrypt from 'bcrypt';
+import session from 'express-session';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,25 +33,41 @@ app.set('views', __dirname + '/public/views');
 
 const dbURL = process.env.monConnect;
 const pokemonKey = process.env.pokemontcg;
+const sessionKey = process.env.sessionKey;
 mongoose.connect(dbURL);
+
+const saltRounds = 10;
 
 // go home 
 app.get('/home', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views/home.html'));
+    res.sendFile(path.join(__dirname, 'public/views/home.html'));
 });
 
 app.get('/user', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/views/user.html'));
 });
 
+app.get('/signUp', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/views/signUp.html'));
+});
+
 app.get('/add-Card', (req,res) => {
     res.sendFile(path.join(__dirname, 'public/views/add-Card.html'));
-})
+});
+
+app.use(session({
+    secret: sessionKey, 
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    }
+}));
 
 //get cards
 app.get('/cards', async (req,res) => {
     try{
-        const userName = admin.username;
+        const userName = req.session.username;
         const user = await User.findOne({ name: userName }).populate('cards');
         res.json(user.cards);
     }catch(e){
@@ -59,13 +78,26 @@ app.get('/cards', async (req,res) => {
 //get binders
 app.get('/binders', async (req,res) => {
     try{
-        const userName = admin.username;
+        const userName = req.session.username;
         const user = await User.findOne({ name: userName }).populate('binders');
         res.json(user.binders);
     }catch(e){
         res.status(500).send(e.message);
     }
 });
+
+app.get('/session-check', (req, res) => {
+    if (req.session.userId) {
+      res.json({ 
+        loggedIn: true,
+        userId: req.session.userId,
+        username: req.session.username 
+      });
+    } else {
+      res.json({ loggedIn: false });
+    }
+  });
+  
 
 //get card image
 async function getCardLargeImage(cardId) {
@@ -127,7 +159,7 @@ app.post('/addCard', async (req, res) => {
         await card.save();
 
         // Add the card to the user's collection
-        const userName = admin.username;
+        const userName = req.session.username;
         await User.updateOne(
             { name: userName },
             { $push: { cards: card._id.toString() } }
@@ -164,13 +196,13 @@ app.post("/add-to-collection", async (req, res) => {
             auto: false,
             variant: card.rarity || "none",
             image: card.images?.large,
-            owner: admin.username
+            owner: req.session.username
         });
 
         await newCard.save();
 
         // Add the card to the user's collection
-        const userName = admin.username;
+        const userName = req.session.username;
         await User.updateOne(
             { name: userName },
             { $push: { cards: newCard._id.toString() } }
@@ -232,6 +264,37 @@ app.delete('/cards', async (req, res) => {
    
 });
 
+app.post('/signup', async (req,res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+
+    try {
+        // check if username already exists
+        const existingUser = await User.findOne({ name: username });
+    
+        if (existingUser) {
+          console.log("Username Taken");
+          return res.redirect("/signUp");
+        }
+
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const user = new User ({
+            name: username,
+            password: hashedPassword,
+            cards: [],
+            binders: []
+        });
+    
+        await user.save();
+
+    res.redirect("/");
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Server error' });
+    }
+});
+
 async function addUser(){
     try{
         const user = new User ({
@@ -251,12 +314,32 @@ async function addUser(){
 //login check
 //hardcoded login
 const admin = {username: "soxe", password: "123"};
-app.post('/login', (req,res) => {
-    const {username,password} = req.body;
-    if(username === admin.username && password === admin.password){
-        res.status(200).json({ message: "Login successful", user: { username } });
-    } else {
-        res.status(401).json({ message: "Invalid username or password" });
+app.post('/login', async (req,res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+
+    try{
+        const user = await User.findOne({ name: username });
+        
+
+        if(!user){
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if(!isMatch){
+            return res.status(401).json({ error: 'Invalid password' });
+        }
+        if (isMatch) {
+            req.session.userId = user._id;
+            req.session.username = user.name;
+            return res.status(200).json({ message: 'Login successful' });
+          }
+    }
+    catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ error: 'Something went wrong. Please try again later.' });
     }
 });
 
@@ -273,7 +356,7 @@ app.delete('/deleteCard', async (req, res) => {
 
         // Remove the card
         const card = await Card.findByIdAndDelete(cardID);
-        const userName = admin.username;
+        const userName = req.session.username;
         await User.updateOne(
             { name: userName },
             { $pull: { cards: card._id.toString() } }
@@ -292,7 +375,7 @@ app.delete('/deleteCard', async (req, res) => {
 app.post('/addBinder', async (req, res) => {
     console.log("Received data:", req.body); 
     const {name} = req.body;
-    const userName = admin.username;
+    const userName = req.session.username;
     const user = await User.findOne({ name: userName })
     console.log('user id: ' + user._id);
     try{
@@ -320,7 +403,7 @@ app.delete('/deleteBinder', async (req, res) => {
 
         // Remove the card
         const binder = await Binder.findByIdAndDelete(binderID);
-        const userName = admin.username;
+        const userName = req.session.username;
         await User.updateOne(
             { name: userName },
             { $pull: { binders: binder._id.toString() } }
@@ -338,7 +421,7 @@ app.delete('/deleteBinder', async (req, res) => {
 //route for individual card
 app.get('/card/:id', async (req, res) => {
     try{
-        const userName = admin.username;
+        const userName = req.session.username;
         const user = await User.findOne({ name: userName }).populate('cards');
         const card = user.cards.find(card => card._id.toString() === req.params.id);
         await user.populate('binders');
@@ -352,7 +435,7 @@ app.get('/card/:id', async (req, res) => {
 
 // Collection route (list all cards)
 app.get('/collection', async (req, res) => {
-    const userName = admin.username;
+    const userName = req.session.username;
     const user = await User.findOne({ name: userName }).populate('cards');
     await user.populate('binders');
     res.render('collection', { cards: user.cards, binders: user.binders });
@@ -361,7 +444,7 @@ app.get('/collection', async (req, res) => {
 //Binders route
 app.get('/binder/:id', async (req,res) => {
     try{
-        const userName = admin.username;
+        const userName = req.session.username;
         //find user and pop binders then cards in binder
         const user = await User.findOne({ name: userName })
             .populate({
@@ -378,6 +461,18 @@ app.get('/binder/:id', async (req,res) => {
     }
 });
 
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+      if (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ error: 'Logout failed' });
+      }
+  
+      res.clearCookie('connect.sid');
+      res.redirect("/");
+    });
+  });
+
 //add card to a binder
 app.post('/add-to-binder', formidable(), async (req, res) => {
     const { cardId, binderId } = req.fields;
@@ -386,7 +481,7 @@ app.post('/add-to-binder', formidable(), async (req, res) => {
         console.log('cardId:', cardId);
         console.log('binderId:', binderId);
   
-        const userName = admin.username;
+        const userName = req.session.username;
         const user = await User.findOne({ name: userName }).populate('binders');
         
         const binder = user.binders.find(b => b._id.toString() === binderId);

@@ -6,59 +6,18 @@
     <body>
         <div class="top-bar">
             <div class="top-bar-wrapper">
-                <div class="page-title">User Page</div>
-                <div class="collection-link">
-                    <a href="/collection">Collection</a>
-                </div>
+              <div class="home-link">
+                <a href="/home">Back to Home</a>
+              </div>
+              <div class="page-title">User Page</div>
+              <div class="collection-link">
+                <a href="/collection">Collection</a>
+              </div>
             </div>
-        </div>
+          </div>          
         <div class="container">
-            <!-- <div>
-                <form id="deleteCard">
-                    <div>
-                        <label for="ddcard">Cards:</label>
-                        <select name="ddcard" id="ddcard"></select>
-                    </div>
-                    <button type="submit" id="deleteSubmit">Delete Card</button>
-                </form>
-            </div> -->
             <div>
-                <a href="/add-Card" class="add-Card">Go to Add Card</a>
-                <!-- <form id="addCard">
-                    <div>
-                        <label for="name">Card Name:</label>
-                        <input type="text" id="name" name="name" oninput="showCardDropdown()" autocomplete="off">
-                    </div>
-                    <ul id="cardDropdown"></ul>
-
-                    <div>
-                        <label for="set">Set:</label>
-                        <input type="text" id="set" name="set" oninput="showSetDropdown()" autocomplete="off">
-                    </div>
-                    <ul id="setDropdown"></ul>
-    
-                    <div>
-                        <label for="cardNumber">Card Number:</label>
-                        <input type="text" id="cardNumber" name="cardNumber" required>
-                    </div>
-    
-                    <div>
-                        <label for="auto">Autographed?:</label>
-                        <input type="checkbox" id="auto" name="auto">
-                    </div>
-    
-                    <div>
-                        <label for="variant">Variants:</label>
-                        <input type="text" id="variant" name="variant" required>
-                    </div>
-    
-                    <div>
-                        <label for="owner">Owner:</label>
-                        <input type="text" id="owner" name="owner" required>
-                    </div>
-    
-                    <button type="submit" id="addSubmit">Add Card</button>
-                </form> -->
+                <a href="/add-Card" class="add-Card">Add Card</a>
             </div>
             <div>
                 <form id="addBinder">Add Binder
@@ -79,11 +38,6 @@
                 </form>
             </div>
         </div>
-        <script src="/js/getPokemonNames.js"></script>
-        <script src="/js/getPokemonSets.js"></script>
-        <script src="/js/getCard.js"></script>
-        <script src="/js/addCard.js"></script>
-        <script src="/js/deleteCard.js"></script>
         <script src="/js/addBinder.js"></script>
         <script src="/js/deleteBinder.js"></script>
         <script src="/js/getBinder.js"></script>
