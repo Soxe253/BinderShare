@@ -4,21 +4,16 @@ html
     title= card.name
     link(rel='stylesheet', href='../css/card.css')
   body
-    // Card View
     .card-container
-      // Image Box on the Left
       .card-image
         img(src=card.image, alt=card.name)
 
-      // Attributes Section on the Right
       .card-details
         h1= card.name
         p Set: #{card.set}
         p Number: #{card.cardNumber}
-        p Auto: #{card.auto ? 'Yes' : 'No'}
         p Variant: #{card.variant}
 
-        // Add to Binder Form
         form(id="addToBinderForm", method="POST")
           input(type="hidden" name="cardId" value=card._id)
           input(type="hidden" name="binderId" value="")
