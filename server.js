@@ -384,7 +384,7 @@ app.post('/addBinder', async (req, res) => {
             cards: [],
             owner: user._id
         })
-        console.log(binder);
+        //console.log(binder);
         await binder.save();
         await User.updateOne(
             { name: userName },
@@ -398,7 +398,7 @@ app.post('/addBinder', async (req, res) => {
 //delete a binder from db and user
 app.delete('/deleteBinder', async (req, res) => {
     try {
-        console.log("Request Body:", req.body);
+        //console.log("Request Body:", req.body);
         const {binderID} = req.body;
 
         // Remove the card
