@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.ok) {
                 const result = await response.json();  // Get the JSON response
                 alert('Binder created successfully');
-                window.location.reload();  // Reload the page to reflect the new binder
+                window.location.reload();  // Reload
             } else {
                 const errorText = await response.text();
                 alert('Error submitting Binder: ' + errorText);
